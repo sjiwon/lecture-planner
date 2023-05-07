@@ -17,6 +17,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+**/src/main/resources/security/
 .idea
 *.iws
 *.iml
