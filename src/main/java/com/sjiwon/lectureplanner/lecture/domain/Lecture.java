@@ -1,5 +1,6 @@
 package com.sjiwon.lectureplanner.lecture.domain;
 
+import com.sjiwon.lectureplanner.professor.domain.Professor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,13 @@ public class Lecture {
 
     private int maxStudent;
 
-    private Lecture(String name, int credit, DayOfWeek dayOfWeek, int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "professor_id", referencedColumnName = "id", nullable = false)
+    private Professor professor;
+
+    private Lecture(Professor professor, String name, int credit, DayOfWeek dayOfWeek,
+                    int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
+        this.professor = professor;
         this.name = name;
         this.credit = credit;
         this.dayOfWeek = dayOfWeek;
@@ -44,7 +51,8 @@ public class Lecture {
         this.maxStudent = maxStudent;
     }
 
-    public static Lecture createLecture(String name, int credit, DayOfWeek dayOfWeek, int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
-        return new Lecture(name, credit, dayOfWeek, startPeriod, endPeriod, possibleGrade, maxStudent);
+    public static Lecture createLecture(Professor professor, String name, int credit, DayOfWeek dayOfWeek,
+                                        int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
+        return new Lecture(professor, name, credit, dayOfWeek, startPeriod, endPeriod, possibleGrade, maxStudent);
     }
 }
