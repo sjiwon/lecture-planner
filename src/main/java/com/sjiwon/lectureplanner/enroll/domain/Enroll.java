@@ -1,6 +1,8 @@
 package com.sjiwon.lectureplanner.enroll.domain;
 
 import com.sjiwon.lectureplanner.global.BaseEntity;
+import com.sjiwon.lectureplanner.lecture.domain.Lecture;
+import com.sjiwon.lectureplanner.student.domain.Student;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,16 +22,20 @@ public class Enroll extends BaseEntity {
     @Column(columnDefinition = "RAW(16)")
     private UUID id;
 
-    private UUID lectureId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "lecture_id", referencedColumnName = "id", nullable = false)
+    private Lecture lecture;
 
-    private UUID studentId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
+    private Student student;
 
-    private Enroll(UUID lectureId, UUID studentId) {
-        this.lectureId = lectureId;
-        this.studentId = studentId;
+    private Enroll(Lecture lecture, Student student) {
+        this.lecture = lecture;
+        this.student = student;
     }
 
-    public static Enroll enrollLecture(UUID lectureId, UUID studentId) {
-        return new Enroll(lectureId, studentId);
+    public static Enroll enrollLecture(Lecture lecture, Student student) {
+        return new Enroll(lecture, student);
     }
 }
