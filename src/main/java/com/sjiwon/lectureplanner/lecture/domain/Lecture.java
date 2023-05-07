@@ -23,6 +23,9 @@ public class Lecture {
 
     private int credit;
 
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
+
     private int startPeriod;
 
     private int endPeriod;
@@ -31,16 +34,17 @@ public class Lecture {
 
     private int maxStudent;
 
-    private Lecture(String name, int credit, int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
+    private Lecture(String name, int credit, DayOfWeek dayOfWeek, int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
         this.name = name;
         this.credit = credit;
+        this.dayOfWeek = dayOfWeek;
         this.startPeriod = startPeriod;
         this.endPeriod = endPeriod;
         this.possibleGrade = possibleGrade;
         this.maxStudent = maxStudent;
     }
 
-    public static Lecture createLecture(String name, int credit, int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
-        return new Lecture(name, credit, startPeriod, endPeriod, possibleGrade, maxStudent);
+    public static Lecture createLecture(String name, int credit, DayOfWeek dayOfWeek, int startPeriod, int endPeriod, int possibleGrade, int maxStudent) {
+        return new Lecture(name, credit, dayOfWeek, startPeriod, endPeriod, possibleGrade, maxStudent);
     }
 }
