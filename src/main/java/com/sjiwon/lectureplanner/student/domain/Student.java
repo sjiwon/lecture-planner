@@ -20,16 +20,22 @@ public class Student extends BaseEntity {
     @Column(columnDefinition = "RAW(16)")
     private UUID id;
 
+    private String loginId;
+
+    private String password;
+
     private String name;
 
     private int grade;
 
-    private Student(String name, int grade) {
+    private Student(String loginId, String password, String name, int grade) {
+        this.loginId = loginId;
+        this.password = password;
         this.name = name;
         this.grade = grade;
     }
 
-    public static Student createStudent(String name, int grade) {
-        return new Student(name, grade);
+    public static Student createStudent(String loginId, String password, String name, int grade) {
+        return new Student(loginId, password, name, grade);
     }
 }
