@@ -18,3 +18,12 @@ spring:
   sql:
     init:
       mode: ALWAYS
+
+  thymeleaf:
+    cache: false
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
