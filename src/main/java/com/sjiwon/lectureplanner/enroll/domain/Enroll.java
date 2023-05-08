@@ -20,16 +20,16 @@ public class Enroll extends BaseEntity {
     @Column(columnDefinition = "RAW(16)")
     private UUID id;
 
-    private UUID lectureId;
-
     private UUID studentId;
 
-    private Enroll(UUID lectureId, UUID studentId) {
-        this.lectureId = lectureId;
+    private UUID lectureId;
+
+    private Enroll(UUID studentId, UUID lectureId) {
         this.studentId = studentId;
+        this.lectureId = lectureId;
     }
 
-    public static Enroll enrollLecture(UUID lectureId, UUID studentId) {
-        return new Enroll(lectureId, studentId);
+    public static Enroll enrollLecture(UUID studentId, UUID lectureId) {
+        return new Enroll(studentId, lectureId);
     }
 }

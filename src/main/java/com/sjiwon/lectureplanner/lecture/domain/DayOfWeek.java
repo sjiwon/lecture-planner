@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum DayOfWeek {
-    MONDAY("월"),
-    TUESDAY("화"),
-    WEDNESDAY("수"),
-    THURSDAY("목"),
-    FRIDAY("금"),
+    MONDAY("월"), // 0
+    TUESDAY("화"), // 1
+    WEDNESDAY("수"), // 2
+    THURSDAY("목"), // 3
+    FRIDAY("금"), // 4
     ;
 
     private final String value;

@@ -24,14 +24,14 @@ public class Lecture {
 
     private int credit;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private DayOfWeek dayOfWeek;
 
     private int startPeriod;
 
     private int endPeriod;
 
-    private int possibleGrade;
+    private int possibleGrade; // 0 = 전체 학년 수강 가능 Lecture
 
     private int maxStudent;
 
