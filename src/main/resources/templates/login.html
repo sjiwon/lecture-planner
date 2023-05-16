@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>경기대학교 수강신청 홈페이지</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+        }
+
+        .login-box {
+            width: 50%;
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-box img {
+            margin-bottom: 20px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="login-box">
+    <img src="#" th:src="@{/images/login_banner.png}" alt="로고"/>
+    <input type="text" name="loginId" placeholder="아이디" required/>
+    <input type="password" name="password" placeholder="비밀번호" required/>
+    <button type="submit" onclick="login()">로그인</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    async function login() {
+        const loginId = document.getElementsByName('loginId')[0].value;
+        const password = document.getElementsByName('password')[0].value;
+
+        try {
+            await axios.post('/api/login', { loginId, password });
+
+            alert('로그인에 성공하였습니다!')
+            location.href = '/'
+        } catch (error) {
+            alert(error.response.data.message)
+        }
+    }
+</script>
+
+</body>
+</html>
