@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>경기대학교 수강신청 홈페이지</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+            background-color: #6799FF;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            margin-right: auto;
+            margin-left: 20px;
+        }
+
+        .header-nav a {
+            margin: 5px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .header-nav a:hover {
+            color: #000000;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .header-right span {
+            margin-right: 10px;
+        }
+
+        .logout-btn {
+            padding: 6px 12px;
+            background-color: transparent;
+            border: none;
+            border-radius: 4px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-nav">
+        <a href="#">수강신청</a> | <a href="#">시간표</a>
+    </div>
+    <div class="header-right">
+        <span th:text="${session.principal.name()}"></span>
+        <span th:text="|(${session.principal.grade()}학년)|"></span>
+        <div>
+            <button class="logout-btn" type="submit" onclick="logout()">로그아웃</button>
+        </div>
+    </div>
+</header>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    async function logout() {
+        try {
+            await axios.post('/api/logout');
+
+            alert('로그아웃에 성공하였습니다!')
+            location.href = '/'
+        } catch (error) {
+            alert(error.response.data.message)
+        }
+    }
+</script>
+
+</body>
+</html>

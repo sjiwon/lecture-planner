@@ -33,4 +33,18 @@ public class AuthApiController {
         HttpSession session = request.getSession(true);
         session.setAttribute("principal", principal);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        clearSession(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    private void clearSession(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+
+        if (session != null) {
+            session.invalidate();
+        }
+    }
 }
