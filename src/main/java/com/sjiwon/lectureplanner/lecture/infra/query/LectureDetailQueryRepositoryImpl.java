@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static com.sjiwon.lectureplanner.enroll.domain.QEnroll.enroll;
 import static com.sjiwon.lectureplanner.lecture.domain.QLecture.lecture;
 import static com.sjiwon.lectureplanner.professor.domain.QProfessor.professor;
 
@@ -28,9 +29,8 @@ public class LectureDetailQueryRepositoryImpl implements LectureDetailQueryRepos
                 .from(lecture)
                 .innerJoin(lecture.professor, professor).fetchJoin()
                 .where(
-                        lectureNameEq(condition.lectureName()),
+                        lectureNameContains(condition.lectureName()),
                         lectureStartPeriodEq(condition.startPeriod()),
-                        lectureEndPeriodEq(condition.endPeriod()),
                         professorIdEq(condition.professorId())
                 )
                 .orderBy(
@@ -49,9 +49,8 @@ public class LectureDetailQueryRepositoryImpl implements LectureDetailQueryRepos
                 .from(lecture)
                 .innerJoin(lecture.professor, professor)
                 .where(
-                        lectureNameEq(condition.lectureName()),
+                        lectureNameContains(condition.lectureName()),
                         lectureStartPeriodEq(condition.startPeriod()),
-                        lectureEndPeriodEq(condition.endPeriod()),
                         professorIdEq(condition.professorId())
                 )
                 .fetchOne();
@@ -59,18 +58,29 @@ public class LectureDetailQueryRepositoryImpl implements LectureDetailQueryRepos
         return PageableExecutionUtils.getPage(lectures, pageable, () -> count);
     }
 
-    private BooleanExpression lectureNameEq(String lectureName) {
-        return (lectureName != null) ? lecture.name.eq(lectureName) : null;
+    @Override
+    public List<Lecture> findByStudentId(UUID studentId) {
+        return query
+                .select(lecture)
+                .from(enroll)
+                .innerJoin(lecture).on(lecture.id.eq(enroll.lectureId))
+                .innerJoin(lecture.professor).fetchJoin()
+                .where(enroll.studentId.eq(studentId))
+                .orderBy(
+                        lecture.dayOfWeek.asc(),
+                        lecture.startPeriod.asc(),
+                        lecture.possibleGrade.asc()
+                )
+                .fetch();
+    }
+
+    private BooleanExpression lectureNameContains(String lectureName) {
+        return (lectureName != null) ? lecture.name.contains(lectureName) : null;
     }
 
     private BooleanExpression lectureStartPeriodEq(Integer startPeriod) {
         return (startPeriod != null) ? lecture.startPeriod.eq(startPeriod) : null;
     }
-
-    private BooleanExpression lectureEndPeriodEq(Integer endPeriod) {
-        return (endPeriod != null) ? lecture.endPeriod.eq(endPeriod) : null;
-    }
-
 
     private BooleanExpression professorIdEq(UUID professorId) {
         return (professorId != null) ? professor.id.eq(professorId) : null;

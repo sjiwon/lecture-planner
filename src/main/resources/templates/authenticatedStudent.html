@@ -60,12 +60,88 @@
         .logout-btn:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+
+        .apply {
+            padding: 6px 12px;
+            background-color: blue;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .apply:hover {
+            background-color: white;
+            color: blue;
+        }
+
+        .table-container {
+            max-width: 95%;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #000000;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pagination ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+        }
+
+        .pagination li {
+            margin-right: 5px;
+        }
+
+        .pagination button {
+            padding: 5px 10px;
+            border: 1px solid #007BFF;
+            border-radius: 15px;
+            background-color: white;
+            color: #007BFF;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .pagination .active a {
+            background-color: #007BFF;
+            color: white;
+        }
     </style>
 </head>
 <body>
 <header class="header">
     <div class="header-nav">
-        <a href="#">수강신청</a> | <a href="#">시간표</a>
+        <a href="/">수강신청</a> | <a href="/my">시간표</a>
     </div>
     <div class="header-right">
         <span th:text="${session.principal.name()}"></span>
@@ -76,8 +152,97 @@
     </div>
 </header>
 
+<br><br>
+
+<div class="table-container">
+    <h1 style="text-align: center;">강의 목록</h1>
+
+    <div style="text-align: right; margin-bottom: 10px;">
+        <div style="margin-bottom: 10px;">
+            <label for="lectureName">강의명:</label>
+            <input type="text" id="lectureName" name="lectureName">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>강의 시간:</label>
+            <label>
+                <input type="radio" name="startPeriod" value="1"> 123
+            </label>
+            <label>
+                <input type="radio" name="startPeriod" value="6"> 678
+            </label>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label for="professor">교수 이름:</label>
+            <select id="professor" th:field="*{professors}">
+                <option value="">교수 선택</option>
+                <option th:each="professor : ${professors}"
+                        th:value="${professor.id()}"
+                        th:text="${professor.name()}">
+                </option>
+            </select>
+        </div>
+        <button type="button" onclick="search()">검색</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>강의 ID</th>
+            <th>교수 이름</th>
+            <th>강의 이름</th>
+            <th>강의 학점</th>
+            <th>강의 시간</th>
+            <th>수강 가능 학년</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="lecture : ${lectureResponse.result}">
+            <td th:text="${#strings.substring(lecture.lectureId(), 0, 5)}"></td>
+            <td th:text="${lecture.professorName}"></td>
+            <td th:text="${lecture.lectureName}"></td>
+            <td th:text="${lecture.lectureCredit}"></td>
+            <td th:text="${lecture.lecturePeriod}"></td>
+            <td th:text="${lecture.possibleGrade}"></td>
+            <td>
+                <button class="apply" th:id="${lecture.lectureId()}" th:name="${lecture.lectureName()}"
+                        onclick="enroll(this.getAttribute('id'), this.getAttribute('name'))">수강 신청
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <ul>
+            <li th:if="${lectureResponse.pagination.prevExists}">
+                <button data-page="1" onclick="goToFirst()">First</button>
+            </li>
+            <li th:if="${lectureResponse.pagination.prevExists}">
+                <button data-page="${lecturePagingResponse.pagination.currentPage - 1}" onclick="goToPrevious()">&lt;
+                </button>
+            </li>
+            <th:block
+                    th:each="pageNumber : ${#numbers.sequence(lectureResponse.pagination.rangeStartNumber, lectureResponse.pagination.rangeEndNumber)}">
+                <li th:class="${pageNumber == lectureResponse.pagination.currentPage ? 'active' : ''}">
+                    <button data-page="${pageNumber}" th:attr="data-page=${pageNumber}"
+                            onclick="goToPage(this.getAttribute('data-page'))" th:text="${pageNumber}"></button>
+                </li>
+            </th:block>
+            <li th:if="${lectureResponse.pagination.nextExists}">
+                <button data-page="${lecturePagingResponse.pagination.currentPage + 1}" onclick="goToNext()">&gt;
+                </button>
+            </li>
+            <li th:if="${lectureResponse.pagination.nextExists}">
+                <button data-page="${lecturePagingResponse.pagination.totalPages}" onclick="goToLast()">Last
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
+<script th:inline="javascript">
     async function logout() {
         try {
             await axios.post('/api/logout');
@@ -88,7 +253,226 @@
             alert(error.response.data.message)
         }
     }
-</script>
 
+    function search() {
+        let newUrl = window.location.origin;
+
+        const lectureName = document.getElementById('lectureName').value;
+        const startPeriod = document.querySelector('input[name="startPeriod"]:checked');
+        const professorId = document.getElementById("professor").value;
+
+        console.log('lecture = ' + lectureName);
+        console.log('startPeriod = ' + startPeriod);
+        console.log('professor = ' + professorId);
+
+        if (lectureName === '' && startPeriod === null && professorId === '') {
+            window.location.href = '/';
+            return;
+        }
+
+        newUrl += '?';
+
+        if (lectureName !== '') {
+            newUrl += 'lectureName=' + lectureName;
+        }
+
+        if (startPeriod !== null) {
+            if (newUrl.includes('=')) {
+                newUrl += '&startPeriod=' + startPeriod.value;
+            } else {
+                newUrl += 'startPeriod=' + startPeriod.value;
+            }
+        }
+
+        if (professorId !== '') {
+            if (newUrl.includes('=')) {
+                newUrl += '&professorId=' + professorId;
+            } else {
+                newUrl += 'professorId=' + professorId;
+            }
+        }
+
+        window.location.href = newUrl;
+    }
+
+    async function enroll(lectureId, lectureName) {
+        const question = confirm(`${lectureName}을 신청하시겠습니까?`)
+
+        if(question) {
+            try {
+                await axios.post(`/api/lectures/${lectureId}`);
+                alert(`${lectureName} 신청 완료`);
+                window.location.href = '/my';
+            } catch (error) {
+                alert(error.response.data.message)
+            }
+        }
+    }
+
+    function goToFirst() {
+        let newUrl = window.location.origin + '?page=1';
+
+        const querystring = window.location.search;
+        const searchParams = new URLSearchParams(querystring);
+
+        const lectureName = searchParams.get('lectureName');
+        const startPeriod = searchParams.get('startPeriod');
+        const professorId = searchParams.get('professorId');
+
+        if (lectureName === null && startPeriod === null && professorId === null) {
+            window.location.href = newUrl;
+            return;
+        }
+
+        if (lectureName !== null) {
+            newUrl += '&lectureName=' + lectureName
+        }
+
+        if (startPeriod !== null) {
+            newUrl += '&startPeriod=' + startPeriod
+        }
+
+        if (professorId !== null) {
+            newUrl += '&professorId=' + professorId
+        }
+
+        window.location.href = newUrl;
+    }
+
+    /*<![CDATA[*/
+    function goToPrevious() {
+        const page = /*[[${lectureResponse.pagination.currentPage}]]*/;
+
+        let newUrl = window.location.origin + '?page=' + (page - 1);
+
+        const querystring = window.location.search;
+        const searchParams = new URLSearchParams(querystring);
+
+        const lectureName = searchParams.get('lectureName');
+        const startPeriod = searchParams.get('startPeriod');
+        const professorId = searchParams.get('professorId');
+
+        if (lectureName === null && startPeriod === null && professorId === null) {
+            window.location.href = newUrl;
+            return;
+        }
+
+        if (lectureName !== null) {
+            newUrl += '&lectureName=' + lectureName
+        }
+
+        if (startPeriod !== null) {
+            newUrl += '&startPeriod=' + startPeriod
+        }
+
+        if (professorId !== null) {
+            newUrl += '&professorId=' + professorId
+        }
+
+        window.location.href = newUrl;
+    }
+
+    /*]]>*/
+
+    function goToPage(pageNumber) {
+        let newUrl = window.location.origin + '?page=' + pageNumber;
+
+        const querystring = window.location.search;
+        const searchParams = new URLSearchParams(querystring);
+
+        const lectureName = searchParams.get('lectureName');
+        const startPeriod = searchParams.get('startPeriod');
+        const professorId = searchParams.get('professorId');
+
+        if (lectureName === null && startPeriod === null && professorId === null) {
+            window.location.href = newUrl;
+            return;
+        }
+
+        if (lectureName !== null) {
+            newUrl += '&lectureName=' + lectureName
+        }
+
+        if (startPeriod !== null) {
+            newUrl += '&startPeriod=' + startPeriod
+        }
+
+        if (professorId !== null) {
+            newUrl += '&professorId=' + professorId
+        }
+
+        window.location.href = newUrl;
+    }
+
+    /*<![CDATA[*/
+    function goToNext() {
+        const page = /*[[${lectureResponse.pagination.currentPage}]]*/;
+
+        let newUrl = window.location.origin + '?page=' + (page + 1);
+
+        const querystring = window.location.search;
+        const searchParams = new URLSearchParams(querystring);
+
+        const lectureName = searchParams.get('lectureName');
+        const startPeriod = searchParams.get('startPeriod');
+        const professorId = searchParams.get('professorId');
+
+        if (lectureName === null && startPeriod === null && professorId === null) {
+            window.location.href = newUrl;
+            return;
+        }
+
+        if (lectureName !== null) {
+            newUrl += '&lectureName=' + lectureName
+        }
+
+        if (startPeriod !== null) {
+            newUrl += '&startPeriod=' + startPeriod
+        }
+
+        if (professorId !== null) {
+            newUrl += '&professorId=' + professorId
+        }
+
+        window.location.href = newUrl;
+    }
+
+    /*]]>*/
+
+    /*<![CDATA[*/
+    function goToLast() {
+        const page = /*[[${lectureResponse.pagination.totalPages}]]*/;
+
+        let newUrl = window.location.origin + '?page=' + page;
+
+        const querystring = window.location.search;
+        const searchParams = new URLSearchParams(querystring);
+
+        const lectureName = searchParams.get('lectureName');
+        const startPeriod = searchParams.get('startPeriod');
+        const professorId = searchParams.get('professorId');
+
+        if (lectureName === null && startPeriod === null && professorId === null) {
+            window.location.href = newUrl;
+            return;
+        }
+
+        if (lectureName !== null) {
+            newUrl += '&lectureName=' + lectureName
+        }
+
+        if (startPeriod !== null) {
+            newUrl += '&startPeriod=' + startPeriod
+        }
+
+        if (professorId !== null) {
+            newUrl += '&professorId=' + professorId
+        }
+
+        window.location.href = newUrl;
+    }
+
+    /*]]>*/
+</script>
 </body>
 </html>

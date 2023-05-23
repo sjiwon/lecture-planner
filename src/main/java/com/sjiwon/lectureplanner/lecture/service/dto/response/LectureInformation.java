@@ -26,7 +26,8 @@ public record LectureInformation(
                 lecture.getName(),
                 lecture.getCredit(),
                 generateTimeline(lecture.getDayOfWeek(), lecture.getStartPeriod(), lecture.getEndPeriod()),
-                translatePossibleGrade(lecture.getPossibleGrade()));
+                translatePossibleGrade(lecture.getPossibleGrade())
+        );
     }
 
     private static String generateTimeline(DayOfWeek week, int startPeriod, int endPeriod) {

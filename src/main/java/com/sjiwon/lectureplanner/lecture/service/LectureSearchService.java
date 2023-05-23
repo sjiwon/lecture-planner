@@ -3,6 +3,7 @@ package com.sjiwon.lectureplanner.lecture.service;
 import com.sjiwon.lectureplanner.lecture.domain.Lecture;
 import com.sjiwon.lectureplanner.lecture.domain.LectureRepository;
 import com.sjiwon.lectureplanner.lecture.service.dto.response.LectureInformation;
+import com.sjiwon.lectureplanner.lecture.service.dto.response.LecturePagingResponse;
 import com.sjiwon.lectureplanner.lecture.service.dto.response.LectureResponse;
 import com.sjiwon.lectureplanner.lecture.utils.search.Pagination;
 import com.sjiwon.lectureplanner.lecture.utils.search.SearchCondition;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -20,7 +22,7 @@ import java.util.List;
 public class LectureSearchService {
     private final LectureRepository lectureRepository;
 
-    public LectureResponse findLecture(SearchCondition condition, Pageable pageable) {
+    public LecturePagingResponse findLecture(SearchCondition condition, Pageable pageable) {
         Page<Lecture> result = lectureRepository.findLectureByCondition(condition, pageable);
 
         List<LectureInformation> lectures = result.getContent()
@@ -33,6 +35,15 @@ public class LectureSearchService {
                 pageable.getPageNumber() + 1
         );
 
-        return new LectureResponse(lectures, pagination);
+        return new LecturePagingResponse(lectures, pagination);
+    }
+
+    public LectureResponse findLectureByStudentId(UUID studentId) {
+        List<LectureInformation> result = lectureRepository.findByStudentId(studentId)
+                .stream()
+                .map(LectureInformation::new)
+                .toList();
+
+        return new LectureResponse(result);
     }
 }
