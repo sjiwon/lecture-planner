@@ -16,10 +16,10 @@ CREATE OR REPLACE PROCEDURE InsertEnroll(input_student_id IN RAW,
     lecture_start_period              LECTURE.START_PERIOD%TYPE;
     lecture_grade                     LECTURE.POSSIBLE_GRADE%TYPE;
 
-    /* {lectureId}에 대해서 수강신청한 기록 존재 Count [Exception 1 Variables] */
+    /* {lectureId}에 대해서 수강신청한 기록 존재 Count [Exception 2 Variables] */
     number_of_enroll_specific_lecture NUMBER;
 
-    /* 현재 {studentId}가 수강 신청한 강의들에 대한 학점 합계 [Exception 2 Variables] */
+    /* 현재 {studentId}가 수강 신청한 강의들에 대한 학점 합계 [Exception 3 Variables] */
     current_enrolled_lecture_credits  NUMBER;
 
     /* 겹치는 강의 개수 [Exception 4 Variables] */
@@ -32,8 +32,6 @@ CREATE OR REPLACE PROCEDURE InsertEnroll(input_student_id IN RAW,
     enroll_lecture_limited_students   NUMBER;
 
 BEGIN
-    --     result := '';
-
     SELECT name, grade
     INTO student_name, student_grade
     FROM STUDENT
@@ -44,7 +42,7 @@ BEGIN
     FROM LECTURE
     WHERE id = input_lecture_id;
 
-    DBMS_OUTPUT.put_line('## 1. 수강신청 요청 ##');
+    DBMS_OUTPUT.put_line('********** 수강신청 요청 **********');
     DBMS_OUTPUT.put_line(
                 '학생 -> ' ||
                 TO_CHAR(student_name) ||
@@ -66,42 +64,42 @@ BEGIN
                 '학년 수강 가능'
         );
 
-    /* Exception 1) 동일 강의 중복 신청 여부 */
+    /* Exception 1) 본인 학년과 맞지 않는 강의 */
+    DBMS_OUTPUT.put_line(CHR(10) || '## 1. 본인 학년과 맞지 않는 강의 여부 검사 (Exception 1) ##');
+    DBMS_OUTPUT.put_line('-> 본인 학년 = ' || TO_CHAR(student_grade));
+    DBMS_OUTPUT.put_line('-> 강의 수강 가능 학년 = ' || TO_CHAR(lecture_grade) || ' (0이면 교양 강의)');
+
+    IF (lecture_grade != 0 AND student_grade != lecture_grade) THEN
+        RAISE do_not_match_grade;
+    END IF;
+
+    /* Exception 2) 동일 강의 중복 신청 여부 */
     SELECT COUNT(e.id)
     INTO number_of_enroll_specific_lecture
     FROM ENROLL e
     WHERE e.lecture_id = input_lecture_id
       AND e.student_id = input_student_id;
 
-    DBMS_OUTPUT.put_line(CHR(10) || '## 2. 동일 강의 중복 신청 여부 검사 (Exception 1) ##');
+    DBMS_OUTPUT.put_line(CHR(10) || '## 2. 동일 강의 중복 신청 여부 검사 (Exception 2) ##');
     DBMS_OUTPUT.put_line('-> 중복 여부 = ' || TO_CHAR(number_of_enroll_specific_lecture) || ' (1 이상이면 중복)');
 
     IF (number_of_enroll_specific_lecture > 0) THEN
         RAISE duplicate_lecture;
     END IF;
 
-    /* Exception 2) 최대학점(21학점) 초과 여부 검사 */
+    /* Exception 3) 최대학점(21학점) 초과 여부 검사 */
     SELECT SUM(l.possible_grade)
     INTO current_enrolled_lecture_credits
     FROM ENROLL e
              INNER JOIN LECTURE l on l.id = e.lecture_id
     WHERE student_id = input_student_id;
 
-    DBMS_OUTPUT.put_line(CHR(10) || '## 3. 최대학점(21학점) 초과 여부 검사 (Exception 2) ##');
+    DBMS_OUTPUT.put_line(CHR(10) || '## 3. 최대학점(21학점) 초과 여부 검사 (Exception 3) ##');
     DBMS_OUTPUT.put_line('-> 현재 신청 학점 = ' || TO_CHAR(current_enrolled_lecture_credits));
     DBMS_OUTPUT.put_line('-> 현재 신청 강의 학점 = ' || TO_CHAR(lecture_credit));
 
     IF (current_enrolled_lecture_credits + lecture_credit > 21) THEN
         RAISE exceed_limited_credits;
-    END IF;
-
-    /* Exception 3) 본인 학년과 맞지 않는 강의 */
-    DBMS_OUTPUT.put_line(CHR(10) || '## 4. 본인 학년과 맞지 않는 강의 여부 검사 (Exception 3) ##');
-    DBMS_OUTPUT.put_line('-> 본인 학년 = ' || TO_CHAR(student_grade));
-    DBMS_OUTPUT.put_line('-> 강의 수강 가능 학년 = ' || TO_CHAR(lecture_grade) || ' (0이면 교양 강의)');
-
-    IF (lecture_grade != 0 AND student_grade != lecture_grade) THEN
-        RAISE do_not_match_grade;
     END IF;
 
     /* Exception 4) 이미 등록한 강의와 겹치는 시간표 */
@@ -113,7 +111,7 @@ BEGIN
       AND l.day_of_week = lecture_day_of_week
       AND l.start_period = lecture_start_period;
 
-    DBMS_OUTPUT.put_line(CHR(10) || '## 5. 이미 등록한 강의와 겹치는지 여부 (Exception 4) ##');
+    DBMS_OUTPUT.put_line(CHR(10) || '## 4. 이미 등록한 강의와 겹치는지 여부 (Exception 4) ##');
     DBMS_OUTPUT.put_line('-> 겹치는 강의 개수 = ' || TO_CHAR(duplicate_lecture_count));
 
     IF (duplicate_lecture_count > 0) THEN
@@ -131,7 +129,7 @@ BEGIN
     FROM LECTURE
     WHERE id = input_lecture_id;
 
-    DBMS_OUTPUT.put_line(CHR(10) || '## 6. 해당 강의 인원 초과 여부 (Exception 5) ##');
+    DBMS_OUTPUT.put_line(CHR(10) || '## 5. 해당 강의 인원 초과 여부 (Exception 5) ##');
     DBMS_OUTPUT.put_line('-> 현재 수강 인원 = ' || TO_CHAR(current_enroll_students));
     DBMS_OUTPUT.put_line('-> 강의 최대 수용 인원 = ' || TO_CHAR(enroll_lecture_limited_students));
 
@@ -147,15 +145,15 @@ BEGIN
     DBMS_OUTPUT.put_line(CHR(10) || '수강신청 등록이 완료되었습니다.');
 
 EXCEPTION
-    WHEN duplicate_lecture THEN
-        DBMS_OUTPUT.put_line(CHR(10) || '동일 강의를 중복 신청할 수 없습니다.');
-        RAISE_APPLICATION_ERROR('-20100', '동일 강의를 중복 신청할 수 없습니다.');
-    WHEN exceed_limited_credits THEN
-        DBMS_OUTPUT.put_line(CHR(10) || '최대학점(21학점)을 초과해서 신청할 수 없습니다.');
-        RAISE_APPLICATION_ERROR('-20200', '최대학점(21학점)을 초과해서 신청할 수 없습니다.');
     WHEN do_not_match_grade THEN
         DBMS_OUTPUT.put_line(CHR(10) || '본인 학년과 맞지 않는 강의는 신청할 수 없습니다.');
-        RAISE_APPLICATION_ERROR('-20300', '본인 학년과 맞지 않는 강의는 신청할 수 없습니다.');
+        RAISE_APPLICATION_ERROR('-20100', '본인 학년과 맞지 않는 강의는 신청할 수 없습니다.');
+    WHEN duplicate_lecture THEN
+        DBMS_OUTPUT.put_line(CHR(10) || '동일 강의를 중복 신청할 수 없습니다.');
+        RAISE_APPLICATION_ERROR('-20200', '동일 강의를 중복 신청할 수 없습니다.');
+    WHEN exceed_limited_credits THEN
+        DBMS_OUTPUT.put_line(CHR(10) || '최대학점(21학점)을 초과해서 신청할 수 없습니다.');
+        RAISE_APPLICATION_ERROR('-20300', '최대학점(21학점)을 초과해서 신청할 수 없습니다.');
     WHEN duplicate_time THEN
         DBMS_OUTPUT.put_line(CHR(10) || '이미 등록한 강의와 시간표가 겹칩니다.');
         RAISE_APPLICATION_ERROR('-20400', '이미 등록한 강의와 시간표가 겹칩니다.');

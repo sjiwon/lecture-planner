@@ -26,9 +26,9 @@ public class EnrollService {
         } catch (DataAccessException exception) {
             if (exception.getCause().getCause() instanceof SQLException ex) {
                 switch (ex.getErrorCode()) {
-                    case 20100 -> throw LecturePlannerException.type(DUPLICATE_LECTURE_ENROLL);
-                    case 20200 -> throw LecturePlannerException.type(EXCEED_LIMITED_CREDITS);
-                    case 20300 -> throw LecturePlannerException.type(DO_NOT_MATCH_GRADE);
+                    case 20100 -> throw LecturePlannerException.type(DO_NOT_MATCH_GRADE);
+                    case 20200 -> throw LecturePlannerException.type(DUPLICATE_LECTURE_ENROLL);
+                    case 20300 -> throw LecturePlannerException.type(EXCEED_LIMITED_CREDITS);
                     case 20400 -> throw LecturePlannerException.type(DUPLICATE_TIME_SCHEDULE);
                     case 20500 -> throw LecturePlannerException.type(EXCEED_LIMITED_NUMBER_OF_STUDENTS);
                     default -> throw LecturePlannerException.type(EnrollErrorCode.INTERNAL_SERVER_ERROR);
