@@ -15,7 +15,7 @@ password=1234
 ```
 #### 3. IntelliJ를 통해서 서버 실행 후 `localhost:8080` 접속
 - IntelliJ가 아닌 다른 IDE면 실행이 제한될 수 있다
-- > 이후 재실행 시 `schema.sql` 맨 위에 있는 4개의 DROP 구문 주석 해제 후 실행
+- 이후 재실행 시 `schema.sql` 맨 위에 있는 4개의 DROP 구문 주석 해제 후 실행
 
 <br>
 
