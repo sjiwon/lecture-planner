@@ -37,10 +37,12 @@ BEGIN
     FROM STUDENT
     WHERE id = input_student_id;
 
+    /* Exclusive Lock */
     SELECT name, credit, day_of_week, start_period, possible_grade
     INTO lecture_name, lecture_credit, lecture_day_of_week, lecture_start_period, lecture_grade
     FROM LECTURE
-    WHERE id = input_lecture_id;
+    WHERE id = input_lecture_id
+    FOR UPDATE;
 
     DBMS_OUTPUT.put_line('********** 수강신청 요청 **********');
     DBMS_OUTPUT.put_line(
