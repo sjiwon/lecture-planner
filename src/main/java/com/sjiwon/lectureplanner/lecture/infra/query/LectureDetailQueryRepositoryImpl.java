@@ -29,6 +29,7 @@ public class LectureDetailQueryRepositoryImpl implements LectureDetailQueryRepos
                 .from(lecture)
                 .innerJoin(lecture.professor, professor).fetchJoin()
                 .where(
+                        gradeEq(condition.grade()),
                         lectureNameContains(condition.lectureName()),
                         lectureStartPeriodEq(condition.startPeriod()),
                         professorIdEq(condition.professorId())
@@ -49,6 +50,7 @@ public class LectureDetailQueryRepositoryImpl implements LectureDetailQueryRepos
                 .from(lecture)
                 .innerJoin(lecture.professor, professor)
                 .where(
+                        gradeEq(condition.grade()),
                         lectureNameContains(condition.lectureName()),
                         lectureStartPeriodEq(condition.startPeriod()),
                         professorIdEq(condition.professorId())
@@ -72,6 +74,10 @@ public class LectureDetailQueryRepositoryImpl implements LectureDetailQueryRepos
                         lecture.possibleGrade.asc()
                 )
                 .fetch();
+    }
+
+    private BooleanExpression gradeEq(Integer grade) {
+        return (grade != null) ? lecture.possibleGrade.eq(grade) : null;
     }
 
     private BooleanExpression lectureNameContains(String lectureName) {

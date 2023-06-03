@@ -159,6 +159,18 @@
 
     <div style="text-align: right; margin-bottom: 10px;">
         <div style="margin-bottom: 10px;">
+            <label for="grade">학년:</label>
+            <select id="grade">
+                <option value="">학년 선택</option>
+                <option th:value="0" th:text="공통">
+                <option th:value="1" th:text="1학년">
+                <option th:value="2" th:text="2학년">
+                <option th:value="3" th:text="3학년">
+                <option th:value="4" th:text="4학년">
+                </option>
+            </select>
+        </div>
+        <div style="margin-bottom: 10px;">
             <label for="lectureName">강의명:</label>
             <input type="text" id="lectureName" name="lectureName">
         </div>
@@ -257,23 +269,28 @@
     function search() {
         let newUrl = window.location.origin;
 
+        const grade = document.getElementById("grade").value;
         const lectureName = document.getElementById('lectureName').value;
         const startPeriod = document.querySelector('input[name="startPeriod"]:checked');
         const professorId = document.getElementById("professor").value;
 
-        console.log('lecture = ' + lectureName);
-        console.log('startPeriod = ' + startPeriod);
-        console.log('professor = ' + professorId);
-
-        if (lectureName === '' && startPeriod === null && professorId === '') {
+        if (grade === '' && lectureName === '' && startPeriod === null && professorId === '') {
             window.location.href = '/';
             return;
         }
 
         newUrl += '?';
 
+        if (grade !== '') {
+            newUrl += 'grade=' + grade;
+        }
+
         if (lectureName !== '') {
-            newUrl += 'lectureName=' + lectureName;
+            if (newUrl.includes('=')) {
+                newUrl += '&lectureName=' + lectureName;
+            } else {
+                newUrl += 'lectureName=' + lectureName;
+            }
         }
 
         if (startPeriod !== null) {
@@ -298,7 +315,7 @@
     async function enroll(lectureId, lectureName) {
         const question = confirm(`${lectureName}을 신청하시겠습니까?`)
 
-        if(question) {
+        if (question) {
             try {
                 await axios.post(`/api/lectures/${lectureId}`);
                 alert(`${lectureName} 신청 완료`);
@@ -315,13 +332,18 @@
         const querystring = window.location.search;
         const searchParams = new URLSearchParams(querystring);
 
+        const grade = searchParams.get('grade');
         const lectureName = searchParams.get('lectureName');
         const startPeriod = searchParams.get('startPeriod');
         const professorId = searchParams.get('professorId');
 
-        if (lectureName === null && startPeriod === null && professorId === null) {
+        if (grade === null && lectureName === null && startPeriod === null && professorId === null) {
             window.location.href = newUrl;
             return;
+        }
+
+        if (grade !== null) {
+            newUrl += '&grade=' + grade
         }
 
         if (lectureName !== null) {
@@ -348,13 +370,18 @@
         const querystring = window.location.search;
         const searchParams = new URLSearchParams(querystring);
 
+        const grade = searchParams.get('grade');
         const lectureName = searchParams.get('lectureName');
         const startPeriod = searchParams.get('startPeriod');
         const professorId = searchParams.get('professorId');
 
-        if (lectureName === null && startPeriod === null && professorId === null) {
+        if (grade === null && lectureName === null && startPeriod === null && professorId === null) {
             window.location.href = newUrl;
             return;
+        }
+
+        if (grade !== null) {
+            newUrl += '&grade=' + grade
         }
 
         if (lectureName !== null) {
@@ -380,13 +407,18 @@
         const querystring = window.location.search;
         const searchParams = new URLSearchParams(querystring);
 
+        const grade = searchParams.get('grade');
         const lectureName = searchParams.get('lectureName');
         const startPeriod = searchParams.get('startPeriod');
         const professorId = searchParams.get('professorId');
 
-        if (lectureName === null && startPeriod === null && professorId === null) {
+        if (grade === null && lectureName === null && startPeriod === null && professorId === null) {
             window.location.href = newUrl;
             return;
+        }
+
+        if (grade !== null) {
+            newUrl += '&grade=' + grade
         }
 
         if (lectureName !== null) {
@@ -413,13 +445,18 @@
         const querystring = window.location.search;
         const searchParams = new URLSearchParams(querystring);
 
+        const grade = searchParams.get('grade');
         const lectureName = searchParams.get('lectureName');
         const startPeriod = searchParams.get('startPeriod');
         const professorId = searchParams.get('professorId');
 
-        if (lectureName === null && startPeriod === null && professorId === null) {
+        if (grade === null && lectureName === null && startPeriod === null && professorId === null) {
             window.location.href = newUrl;
             return;
+        }
+
+        if (grade !== null) {
+            newUrl += '&grade=' + grade
         }
 
         if (lectureName !== null) {
@@ -448,13 +485,18 @@
         const querystring = window.location.search;
         const searchParams = new URLSearchParams(querystring);
 
+        const grade = searchParams.get('grade');
         const lectureName = searchParams.get('lectureName');
         const startPeriod = searchParams.get('startPeriod');
         const professorId = searchParams.get('professorId');
 
-        if (lectureName === null && startPeriod === null && professorId === null) {
+        if (grade === null && lectureName === null && startPeriod === null && professorId === null) {
             window.location.href = newUrl;
             return;
+        }
+
+        if (grade !== null) {
+            newUrl += '&grade=' + grade
         }
 
         if (lectureName !== null) {

@@ -26,6 +26,7 @@ public class AuthController {
 
     @GetMapping
     public String init(@SessionAttribute(name = "principal", required = false) StudentPrincipal principal,
+                       @RequestParam(required = false) Integer grade,
                        @RequestParam(required = false) String lectureName,
                        @RequestParam(required = false) Integer startPeriod,
                        @RequestParam(required = false) UUID professorId,
@@ -35,7 +36,7 @@ public class AuthController {
             return "login";
         }
 
-        SearchCondition condition = new SearchCondition(lectureName, startPeriod, professorId);
+        SearchCondition condition = new SearchCondition(grade, lectureName, startPeriod, professorId);
         Pageable pageable = PagingConstants.getPageRequest(page);
 
         applyLectureResponse(model, condition, pageable);
