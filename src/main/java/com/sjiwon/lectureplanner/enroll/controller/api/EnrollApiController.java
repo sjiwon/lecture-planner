@@ -17,14 +17,14 @@ public class EnrollApiController {
     @PostMapping
     public ResponseEntity<Void> enroll(@SessionAttribute(name = "principal", required = false) StudentPrincipal principal,
                                        @PathVariable UUID lectureId) {
-        enrollService.enroll(lectureId, principal.id());
+        enrollService.enroll(principal.id(), lectureId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> cancelEnroll(@SessionAttribute(name = "principal", required = false) StudentPrincipal principal,
                                              @PathVariable UUID lectureId) {
-        enrollService.cancelEnroll(lectureId, principal.id());
+        enrollService.cancelEnroll(principal.id(), lectureId);
         return ResponseEntity.noContent().build();
     }
 }

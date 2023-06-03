@@ -20,7 +20,7 @@ public class EnrollService {
     private final EnrollRepository enrollRepository;
 
     @Transactional
-    public void enroll(UUID lectureId, UUID studentId) {
+    public void enroll(UUID studentId, UUID lectureId) {
         try {
             enrollRepository.enrollLecture(studentId, lectureId);
         } catch (DataAccessException exception) {
@@ -38,7 +38,7 @@ public class EnrollService {
     }
 
     @Transactional
-    public void cancelEnroll(UUID lectureId, UUID studentId) {
-        enrollRepository.deleteEnroll(lectureId, studentId);
+    public void cancelEnroll(UUID studentId, UUID lectureId) {
+        enrollRepository.deleteEnroll(studentId, lectureId);
     }
 }

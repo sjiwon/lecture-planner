@@ -62,14 +62,23 @@ CREATE TABLE ENROLL
 ALTER TABLE lecture
 ADD CONSTRAINT lecture_professor_professor_id_fk
 FOREIGN KEY (professor_id)
-REFERENCES professor;
+REFERENCES professor (id);
 
 ALTER TABLE enroll
 ADD CONSTRAINT enroll_student_student_id_fk
 FOREIGN KEY (student_id)
-REFERENCES student;
+REFERENCES student (id);
 
 ALTER TABLE enroll
 ADD CONSTRAINT enroll_lecture_lecture_id_fk
 FOREIGN KEY (lecture_id)
-REFERENCES lecture;
+REFERENCES lecture (id);
+
+-- Index
+CREATE INDEX lecture_professor_id_idx ON lecture (professor_id);
+CREATE INDEX lecture_possible_grade_idx ON lecture (possible_grade);
+CREATE INDEX lecture_name_idx ON lecture (name);
+CREATE INDEX lecture_start_period_idx ON lecture (start_period);
+
+CREATE INDEX enroll_lecture_id_idx ON enroll (lecture_id);
+CREATE INDEX enroll_student_id_idx ON enroll (student_id);

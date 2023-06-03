@@ -14,6 +14,6 @@ public interface EnrollRepository extends JpaRepository<Enroll, UUID> {
                        @Param("input_lecture_id") UUID inputLectureId);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("DELETE FROM Enroll e WHERE e.lectureId = :lectureId AND e.studentId = :studentId")
-    void deleteEnroll(@Param("lectureId") UUID lectureId, @Param("studentId") UUID studentId);
+    @Query("DELETE FROM Enroll e WHERE e.studentId = :studentId AND e.lectureId = :lectureId")
+    void deleteEnroll(@Param("studentId") UUID studentId, @Param("lectureId") UUID lectureId);
 }
