@@ -9,10 +9,20 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.UUID;
 
+import static javax.persistence.ParameterMode.IN;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "enroll")
+@NamedStoredProcedureQuery(
+        name = "Enroll.InsertEnroll",
+        procedureName = "InsertEnroll",
+        parameters = {
+                @StoredProcedureParameter(mode = IN, name = "input_student_id", type = UUID.class),
+                @StoredProcedureParameter(mode = IN, name = "input_lecture_id", type = UUID.class)
+        }
+)
 public class Enroll extends BaseEntity {
     @Id
     @GeneratedValue(generator = "uuid2")
