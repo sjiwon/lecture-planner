@@ -41,8 +41,7 @@ BEGIN
     SELECT name, credit, day_of_week, start_period, possible_grade
     INTO lecture_name, lecture_credit, lecture_day_of_week, lecture_start_period, lecture_grade
     FROM LECTURE
-    WHERE id = input_lecture_id
-    FOR UPDATE;
+    WHERE id = input_lecture_id FOR UPDATE;
 
     DBMS_OUTPUT.put_line('********** 수강신청 요청 **********');
     DBMS_OUTPUT.put_line(
@@ -79,8 +78,9 @@ BEGIN
     SELECT COUNT(e.id)
     INTO number_of_enroll_specific_lecture
     FROM ENROLL e
-    WHERE e.lecture_id = input_lecture_id
-      AND e.student_id = input_student_id;
+             INNER JOIN Lecture l ON l.id = e.lecture_id
+    WHERE e.student_id = input_student_id
+      AND l.name = lecture_name;
 
     DBMS_OUTPUT.put_line(CHR(10) || '## 2. 동일 강의 중복 신청 여부 검사 (Exception 2) ##');
     DBMS_OUTPUT.put_line('-> 중복 여부 = ' || TO_CHAR(number_of_enroll_specific_lecture) || ' (1 이상이면 중복)');
@@ -90,7 +90,7 @@ BEGIN
     END IF;
 
     /* Exception 3) 최대학점(21학점) 초과 여부 검사 */
-    SELECT SUM(l.possible_grade)
+    SELECT SUM(l.credit)
     INTO current_enrolled_lecture_credits
     FROM ENROLL e
              INNER JOIN LECTURE l on l.id = e.lecture_id
@@ -98,7 +98,7 @@ BEGIN
 
     DBMS_OUTPUT.put_line(CHR(10) || '## 3. 최대학점(21학점) 초과 여부 검사 (Exception 3) ##');
     DBMS_OUTPUT.put_line('-> 현재 신청 학점 = ' || TO_CHAR(current_enrolled_lecture_credits));
-    DBMS_OUTPUT.put_line('-> 현재 신청 강의 학점 = ' || TO_CHAR(lecture_credit));
+    DBMS_OUTPUT.put_line('-> 강의 학점 = ' || TO_CHAR(lecture_credit));
 
     IF (current_enrolled_lecture_credits + lecture_credit > 21) THEN
         RAISE exceed_limited_credits;
